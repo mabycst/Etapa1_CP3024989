@@ -1,0 +1,21 @@
+# Maven
+**/target/
+target/
+
+# IDE configurations
+.idea/
+*.iml
+.settings/
+.classpath
+.project
+
+# Banco local MYSQL
+mysql_data/
+
+# OS specific files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# vscode
+.vscode
