@@ -51,6 +51,8 @@ public class UserService {
         );
 
         userRepository.save(user);
+
+
     }
 
     public RecoveryJwtTokenDto authenticateUser(LoginUserDto loginUserDto) {

@@ -32,6 +32,8 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.POST, "/users/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/request-code").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/verify-code").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users/test/customer").hasRole("CUSTOMER")
                         .anyRequest().authenticated()
                 )
