@@ -1,5 +1,6 @@
 package com.example.userservice.controller;
 
+import com.example.userservice.dto.RecoveryJwtTokenDto;
 import com.example.userservice.dto.RequestCodeDto;
 import com.example.userservice.dto.VerifyCodeDto;
 import com.example.userservice.service.AuthService;
@@ -24,12 +25,12 @@ public class AuthController {
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<String> verifyCode(@Valid @RequestBody VerifyCodeDto verifyCodeDto) {
-        boolean isValid = authService.verifyCode(verifyCodeDto.email(), verifyCodeDto.code());
-        if (isValid) {
-            return ResponseEntity.ok("Código validado com sucesso!");
+    public ResponseEntity<RecoveryJwtTokenDto> verifyCode(@Valid @RequestBody VerifyCodeDto verifyCodeDto) {
+        String token = authService.verifyCode(verifyCodeDto.email(), verifyCodeDto.code());
+        if (token != null) {
+            return ResponseEntity.ok(new RecoveryJwtTokenDto(token));
         } else {
-            return ResponseEntity.badRequest().body("Código inválido ou expirado.");
+            return ResponseEntity.badRequest().build();
         }
     }
 }

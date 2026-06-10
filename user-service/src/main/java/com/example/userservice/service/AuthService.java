@@ -7,6 +7,8 @@ import com.example.userservice.dto.EmailDto;
 import com.example.userservice.producer.UserProducer;
 import com.example.userservice.repository.RoleRepository;
 import com.example.userservice.repository.UserRepository;
+import com.example.userservice.security.JwtTokenService;
+import com.example.userservice.security.UserDetailsImpl;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -22,15 +24,17 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final CodigoCacheService codigoCacheService;
     private final UserProducer userProducer;
+    private final JwtTokenService jwtTokenService;
 
     public AuthService(UserRepository userRepository, RoleRepository roleRepository,
                        PasswordEncoder passwordEncoder, CodigoCacheService codigoCacheService,
-                       UserProducer userProducer) {
+                       UserProducer userProducer, JwtTokenService jwtTokenService) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.codigoCacheService = codigoCacheService;
         this.userProducer = userProducer;
+        this.jwtTokenService = jwtTokenService;
     }
 
     public void requestCode(String email) {
@@ -68,12 +72,15 @@ public class AuthService {
         userProducer.publishEmailMessage(emailDto);
     }
 
-    public boolean verifyCode(String email, String code) {
+    public String verifyCode(String email, String code) {
         String cachedCode = codigoCacheService.get(email);
         if (cachedCode != null && cachedCode.equals(code)) {
             codigoCacheService.delete(email); // Consome o código após validação
-            return true;
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado com e-mail: " + email));
+            UserDetailsImpl userDetails = new UserDetailsImpl(user);
+            return jwtTokenService.generateToken(userDetails);
         }
-        return false;
+        return null;
     }
 }
